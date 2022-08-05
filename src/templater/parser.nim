@@ -7,19 +7,22 @@ type
     vars: Table[string, VarType]
 
 func newParser(code: string, vars: Table[string, VarType]): Parser =
-  new result
-  result.code = code
-  result.index = 0
-  result.vars = vars
+  Parser(code: code, index: 0, vars: vars)
 
-func current(parser: Parser): char =
+func current(parser: Parser): char = 
   parser.code[parser.index]
 
-func peek(parser: Parser, n: int = 1): char =
+func peek(parser: Parser, n: int = 1): char = 
   parser.code[parser.index + n]
 
-func skip(parser: var Parser, n: int): void =
+func skip(parser: var Parser, n: int): void = 
   parser.index += n
+
+func next(parser: Parser): bool = 
+  parser.index < parser.code.len
+
+func hasVar(parser: Parser, key: string): bool = 
+  parser.vars.hasKey(key)
 
 func collectUntil(parser: Parser, delimiter: char): string =
   var n = 0
@@ -32,10 +35,6 @@ func collectUntil(parser: Parser, slice: string): string =
   while parser.code[parser.index + n .. parser.index + n + slice.len - 1] != slice:
     result.add(parser.peek(n))
     inc n
-
-func hasVar(parser: Parser, key: string): bool = parser.vars.hasKey(key)
-
-func next(parser: Parser): bool = parser.index < parser.code.len
 
 func parseVar(parser: var Parser): void =
   let name = parser.collectUntil('|')
